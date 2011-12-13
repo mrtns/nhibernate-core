@@ -322,8 +322,8 @@ namespace NHibernate.AdoNet
 
 		private void CloseCommand(IDbCommand cmd)
 		{
-			try
-			{
+			try {
+			    CleanupParameters(cmd);
 				// no equiv to the java code in here
 				cmd.Dispose();
 				LogClosePreparedCommand();
@@ -347,7 +347,19 @@ namespace NHibernate.AdoNet
 			}
 		}
 
-		public void CloseCommand(IDbCommand st, IDataReader reader)
+	    private void CleanupParameters(IDbCommand cmd) {
+            foreach(IDataParameter p in cmd.Parameters) {
+                if(p.GetType() is IDisposable) {
+                    if(p.Value.GetType() is IDisposable) {
+                        ((IDisposable)p.Value).Dispose();
+                    }
+                    ((IDisposable)p).Dispose();
+                }
+            }
+            cmd.Parameters.Clear();
+	    }
+
+	    public void CloseCommand(IDbCommand st, IDataReader reader)
 		{
 			commandsToClose.Remove(st);
 			try
