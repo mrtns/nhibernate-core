@@ -355,8 +355,8 @@ namespace NHibernate.AdoNet
 
 	    private void CleanupParameters(IDbCommand cmd) {
             foreach(IDataParameter p in cmd.Parameters) {
-                if(p.GetType() is IDisposable) {
-                    if(p.Value.GetType() is IDisposable) {
+                if(p is IDisposable & p != null) {
+                    if(p.Value is IDisposable & p.Value != null) {
                         ((IDisposable)p.Value).Dispose();
                     }
                     ((IDisposable)p).Dispose();
