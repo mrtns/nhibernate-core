@@ -75,14 +75,20 @@ namespace NHibernate.AdoNet
 		{
 			SqlString sql = GetSQL(sqlString);
 
-			IDbCommand cmd = factory.ConnectionProvider.Driver.GenerateCommand(type, sql, parameterTypes);
-			LogOpenPreparedCommand();
-			if (log.IsDebugEnabled)
-			{
-				log.Debug("Building an IDbCommand object for the SqlString: " + sql);
-			}
-			commandsToClose.Add(cmd);
-			return cmd;
+		    IDbCommand cmd = null;
+		    try {
+		        cmd = factory.ConnectionProvider.Driver.GenerateCommand(type, sql, parameterTypes);
+		        LogOpenPreparedCommand();
+		        if (log.IsDebugEnabled)
+		        {
+		            log.Debug("Building an IDbCommand object for the SqlString: " + sql);
+		        }
+		    }
+		    finally {
+                if(cmd != null) 
+		            commandsToClose.Add(cmd);
+		    }
+		    return cmd;
 		}
 
 		/// <summary>
